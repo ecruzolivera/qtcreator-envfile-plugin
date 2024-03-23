@@ -1,0 +1,11 @@
+{
+    "Name" : "EnvFilePlugin",
+    "Version" : "0.0.1",
+    "CompatVersion" : "0.0.1",
+    "Vendor" : "ecruzolivera",
+    "Copyright" : "(C) ecruzolivera",
+    "License" : "LGPL v3",
+    "Description" : "Load environment variables from file",
+    "Url" : "https://github.com/ecruzolivera",
+    ${IDE_PLUGIN_DEPENDENCIES}
+}
