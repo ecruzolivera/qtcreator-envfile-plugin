@@ -26,7 +26,7 @@ EnvFilePluginPlugin::~EnvFilePluginPlugin()
     // Delete members
 }
 
-void EnvFilePluginPlugin::initialize()
+bool EnvFilePluginPlugin::initialize(const QStringList &arguments, QString *errorString)
 {
     // Register objects in the plugin manager's object pool
     // Load settings
@@ -51,6 +51,7 @@ void EnvFilePluginPlugin::initialize()
     menu->menu()->setTitle(tr("EnvFilePlugin"));
     menu->addAction(cmd);
     Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
+    return true;
 }
 
 void EnvFilePluginPlugin::extensionsInitialized()

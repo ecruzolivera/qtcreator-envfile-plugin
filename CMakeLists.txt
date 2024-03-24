@@ -49,3 +49,8 @@ add_qtc_plugin(EnvFilePlugin
     envfileplugin_global.h
     envfilepluginconstants.h
 )
+
+target_sources(EnvFilePlugin
+  PRIVATE
+    EnvFileSettings.h EnvFileSettings.cpp
+)

@@ -5,7 +5,14 @@
     "Vendor" : "ecruzolivera",
     "Copyright" : "(C) ecruzolivera",
     "License" : "LGPL v3",
-    "Description" : "Load environment variables from file",
-    "Url" : "https://github.com/ecruzolivera",
+    "Description" : "Load environment variables from a file",
+    "Url" : "https://github.com/ecruzolivera/qtcreator-envfile-plugin",
+    "Arguments" : [
+        {
+            "Name" : "-env-file",
+            "Parameter" : "PATH",
+            "Description" : "env file to use"
+        }
+    ],
     ${IDE_PLUGIN_DEPENDENCIES}
 }

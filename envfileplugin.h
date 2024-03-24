@@ -1,6 +1,5 @@
 #pragma once
 
-#include "envfileplugin_global.h"
 
 #include <extensionsystem/iplugin.h>
 
@@ -15,7 +14,7 @@ public:
     EnvFilePluginPlugin();
     ~EnvFilePluginPlugin() override;
 
-    void initialize() override;
+    bool initialize(const QStringList &arguments, QString *errorString) override;
     void extensionsInitialized() override;
     ShutdownFlag aboutToShutdown() override;
 
