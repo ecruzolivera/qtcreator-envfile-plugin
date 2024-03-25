@@ -1,7 +1,8 @@
 #pragma once
 
-
 #include <extensionsystem/iplugin.h>
+#include <projectexplorer/project.h>
+#include <projectexplorer/projectmanager.h>
 
 namespace EnvFilePlugin::Internal {
 
@@ -19,7 +20,8 @@ public:
     ShutdownFlag aboutToShutdown() override;
 
 private:
-    void triggerAction();
+ static void connectTarget(ProjectExplorer::Project *project, ProjectExplorer::Target *target);
+ void processEnvFile();
 };
 
 } // namespace EnvFilePlugin::Internal

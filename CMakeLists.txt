@@ -36,6 +36,7 @@ endif()
 add_qtc_plugin(EnvFilePlugin
   PLUGIN_DEPENDS
     QtCreator::Core
+    QtCreator::ProjectExplorer
   DEPENDS
     ${QtX}::Widgets
     QtCreator::ExtensionSystem

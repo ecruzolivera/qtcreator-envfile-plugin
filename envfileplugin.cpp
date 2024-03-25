@@ -1,5 +1,4 @@
 #include "envfileplugin.h"
-#include "envfilepluginconstants.h"
 
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
@@ -7,11 +6,16 @@
 #include <coreplugin/coreconstants.h>
 #include <coreplugin/icontext.h>
 #include <coreplugin/icore.h>
+#include <projectexplorer/project.h>
+#include <projectexplorer/projectmanager.h>
+#include <projectexplorer/target.h>
 
-#include <QAction>
-#include <QMainWindow>
-#include <QMenu>
-#include <QMessageBox>
+#include <QDebug>
+
+#include "EnvFileSettings.h"
+
+using namespace ProjectExplorer;
+using namespace Utils;
 
 namespace EnvFilePlugin::Internal {
 
@@ -38,19 +42,11 @@ bool EnvFilePluginPlugin::initialize(const QStringList &arguments, QString *erro
     // If you need access to command line arguments or to report errors, use the
     //    bool IPlugin::initialize(const QStringList &arguments, QString *errorString)
     // overload.
+    auto isEnable = EnvFile::settings().enableLoadEnvFile();
+    if (isEnable) {
+      processEnvFile();
+    }
 
-    auto action = new QAction(tr("EnvFilePlugin Action"), this);
-    Core::Command *cmd = Core::ActionManager::registerAction(action,
-                                                             Constants::ACTION_ID,
-                                                             Core::Context(
-                                                                 Core::Constants::C_GLOBAL));
-    cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+Alt+Meta+A")));
-    connect(action, &QAction::triggered, this, &EnvFilePluginPlugin::triggerAction);
-
-    Core::ActionContainer *menu = Core::ActionManager::createMenu(Constants::MENU_ID);
-    menu->menu()->setTitle(tr("EnvFilePlugin"));
-    menu->addAction(cmd);
-    Core::ActionManager::actionContainer(Core::Constants::M_TOOLS)->addMenu(menu);
     return true;
 }
 
@@ -69,11 +65,29 @@ ExtensionSystem::IPlugin::ShutdownFlag EnvFilePluginPlugin::aboutToShutdown()
     return SynchronousShutdown;
 }
 
-void EnvFilePluginPlugin::triggerAction()
-{
-    QMessageBox::information(Core::ICore::mainWindow(),
-                             tr("Action Triggered"),
-                             tr("This is an action from EnvFilePlugin."));
+void EnvFilePluginPlugin::processEnvFile() {
+  auto envFilePath = EnvFile::settings().envFilePath().path();
+  using namespace ProjectExplorer;
+
+  qDebug() << "hereee1 ";
+  // clang-format off
+  connect(ProjectManager::instance(), &ProjectManager::projectAdded, this, [](Project *project) {
+
+  qDebug() << "hereee2 ";
+        connect(project, &Project::addedTarget, project, [project](Target *target) {
+
+  qDebug() << "hereee3 ";
+            connectTarget(project, target);
+      });
+  });
+  // clang-format on
+}
+
+void EnvFilePluginPlugin::connectTarget(ProjectExplorer::Project *project, ProjectExplorer::Target *target) {
+  qDebug() << "hereee5 ";
+  // const auto projectDirectory = project->projectDirectory();
+  qDebug() << "project " << project->displayName();
+  qDebug() << "target " << target->displayName();
 }
 
 } // namespace EnvFilePlugin::Internal

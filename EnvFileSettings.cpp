@@ -24,8 +24,10 @@ EnvFileSettings::EnvFileSettings() {
 
     // clang-format off
     return Column {
-            enableLoadEnvFile,
-            envFilePath
+               Row {
+                  enableLoadEnvFile,
+                  envFilePath,
+        }, st
     };
     // clang-format on
   };
