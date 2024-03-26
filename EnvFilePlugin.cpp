@@ -1,4 +1,4 @@
-#include "envfileplugin.h"
+#include "EnvFilePlugin.h"
 
 #include <coreplugin/actionmanager/actioncontainer.h>
 #include <coreplugin/actionmanager/actionmanager.h>
@@ -18,6 +18,8 @@ using namespace ProjectExplorer;
 using namespace Utils;
 
 namespace EnvFilePlugin::Internal {
+
+const QString EnvFilePluginPlugin::ENV_FILE_PATTERN = ".env";
 
 EnvFilePluginPlugin::EnvFilePluginPlugin()
 {
@@ -66,28 +68,45 @@ ExtensionSystem::IPlugin::ShutdownFlag EnvFilePluginPlugin::aboutToShutdown()
 }
 
 void EnvFilePluginPlugin::processEnvFile() {
-  auto envFilePath = EnvFile::settings().envFilePath().path();
-  using namespace ProjectExplorer;
-
-  qDebug() << "hereee1 ";
-  // clang-format off
-  connect(ProjectManager::instance(), &ProjectManager::projectAdded, this, [](Project *project) {
-
-  qDebug() << "hereee2 ";
-        connect(project, &Project::addedTarget, project, [project](Target *target) {
-
-  qDebug() << "hereee3 ";
-            connectTarget(project, target);
-      });
-  });
-  // clang-format on
+  const auto envFilePath = EnvFile::settings().envFilePath().path();
+  const auto isEnabled = EnvFile::settings().enableLoadEnvFile();
+  qInfo() << "envFilePath  " << envFilePath;
+  qInfo() << "isEnabled   " << isEnabled;
+  if (!isEnabled) {
+    return;
+  }
+  connect(ProjectManager::instance(), &ProjectManager::projectAdded, this, connectProject);
 }
 
-void EnvFilePluginPlugin::connectTarget(ProjectExplorer::Project *project, ProjectExplorer::Target *target) {
-  qDebug() << "hereee5 ";
-  // const auto projectDirectory = project->projectDirectory();
+void EnvFilePluginPlugin::connectProject(ProjectExplorer::Project *project) {
+  qDebug() << "project " << project->displayName();
+  connect(project, &Project::addedTarget, project, [project](Target *target) { processTarget(project, target); });
+  connect(project, &Project::activeTargetChanged, project, [project](Target *target) {
+    processTarget(project, target);
+  });
+  auto activeTarget = project->activeTarget();
+  processTarget(project, activeTarget);
+}
+
+void EnvFilePluginPlugin::processTarget(ProjectExplorer::Project *project, ProjectExplorer::Target *target) {
+  if (!project) {
+    qDebug() << "no project";
+    return;
+  }
+
+  if (!target) {
+    qDebug() << "no target";
+    return;
+  }
   qDebug() << "project " << project->displayName();
   qDebug() << "target " << target->displayName();
+
+  const auto projectDirectory = project->projectDirectory();
+
+  qDebug() << "projectDirectory  " << projectDirectory;
+
+  const auto projectEnvFilePath = projectDirectory / ENV_FILE_PATTERN;
+  qDebug() << "envFilePath  " << projectEnvFilePath;
 }
 
-} // namespace EnvFilePlugin::Internal
+}  // namespace EnvFilePlugin::Internal

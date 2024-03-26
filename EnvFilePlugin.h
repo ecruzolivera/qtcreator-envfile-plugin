@@ -20,8 +20,10 @@ public:
     ShutdownFlag aboutToShutdown() override;
 
 private:
- static void connectTarget(ProjectExplorer::Project *project, ProjectExplorer::Target *target);
  void processEnvFile();
+ static void connectProject(ProjectExplorer::Project *project);
+ static void processTarget(ProjectExplorer::Project *project, ProjectExplorer::Target *target);
+ static const QString ENV_FILE_PATTERN;
 };
 
 } // namespace EnvFilePlugin::Internal

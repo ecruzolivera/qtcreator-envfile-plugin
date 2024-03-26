@@ -45,10 +45,10 @@ add_qtc_plugin(EnvFilePlugin
     .github/workflows/build_cmake.yml
     .github/workflows/README.md
     README.md
-    envfileplugin.cpp
-    envfileplugin.h
+    EnvFilePlugin.cpp
+    EnvFilePlugin.h
     envfileplugin_global.h
-    envfilepluginconstants.h
+
 )
 
 target_sources(EnvFilePlugin
