@@ -16,7 +16,7 @@ EnvFileSettings::EnvFileSettings() {
   enableLoadEnvFile.setDefaultValue(true);
 
   envFilePath.setSettingsKey("EnvFilePath");
-  envFilePath.setDefaultValue(".env");
+  envFilePath.setDefaultValue("");
   envFilePath.setExpectedKind(Utils::PathChooser::File);
 
   auto layout = [this] {

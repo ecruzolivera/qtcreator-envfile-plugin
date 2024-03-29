@@ -11,6 +11,9 @@
 #include <projectexplorer/target.h>
 
 #include <QDebug>
+#include <QFile>
+#include <QFileInfo>
+#include <QString>
 
 #include "EnvFileSettings.h"
 
@@ -107,6 +110,42 @@ void EnvFilePluginPlugin::processTarget(ProjectExplorer::Project *project, Proje
 
   const auto projectEnvFilePath = projectDirectory / ENV_FILE_PATTERN;
   qDebug() << "envFilePath  " << projectEnvFilePath;
+  auto envFileInfo = QFileInfo{projectEnvFilePath.absoluteFilePath().toFSPathString()};
+
+  qDebug() << "envFileInfo     " << envFileInfo;
+
+  qDebug() << "envFileInfo exists    " << envFileInfo.exists();
+  if (!envFileInfo.exists()) {
+    return;
+  }
+
+  auto file = QFile{envFileInfo.absoluteFilePath()};
+  if (!file.open(QIODevice::ReadOnly)) {
+    qWarning() << "could not open env file: " << envFileInfo.absoluteFilePath();
+    return;
+  }
+  auto contentRaw = file.readAll();
+  auto content = QString::fromUtf8(contentRaw);
+  auto lines = content.split("\n");
+  for (const auto &line : lines) {
+    if (auto maybeEnvVar = getEnvVarFromLine(line); maybeEnvVar) {
+      loadEnvVariable(target, maybeEnvVar.value());
+    }
+  }
+}
+
+std::optional<QPair<QString, QString>> EnvFilePluginPlugin::getEnvVarFromLine(const QString &line) {
+  auto envPairInList = line.split("=");
+  if (envPairInList.size() != 2) {
+    return {};
+  }
+  auto envVar = envPairInList.at(1).trimmed();
+  auto envValue = envPairInList.at(2).trimmed();
+  return QPair<QString, QString>{envVar, envValue};
+}
+
+void EnvFilePluginPlugin::loadEnvVariable(ProjectExplorer::Target *target, const QPair<QString, QString> &envVariable) {
+  auto [envVar, envValue] = envVariable;
 }
 
 }  // namespace EnvFilePlugin::Internal

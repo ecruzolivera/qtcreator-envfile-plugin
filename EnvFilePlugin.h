@@ -4,6 +4,8 @@
 #include <projectexplorer/project.h>
 #include <projectexplorer/projectmanager.h>
 
+#include <optional>
+
 namespace EnvFilePlugin::Internal {
 
 class EnvFilePluginPlugin : public ExtensionSystem::IPlugin
@@ -23,6 +25,8 @@ private:
  void processEnvFile();
  static void connectProject(ProjectExplorer::Project *project);
  static void processTarget(ProjectExplorer::Project *project, ProjectExplorer::Target *target);
+ static std::optional<QPair<QString, QString>> getEnvVarFromLine(const QString &line);
+ static void loadEnvVariable(ProjectExplorer::Target *target, const QPair<QString, QString> &envVariable);
  static const QString ENV_FILE_PATTERN;
 };
 
