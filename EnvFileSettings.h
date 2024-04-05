@@ -14,7 +14,7 @@ class EnvFileSettings : public Utils::AspectContainer {
   EnvFileSettings();
 
   Utils::BoolAspect enableLoadEnvFile{this};
-  Utils::FilePathAspect envFilePath{this};
+  Utils::StringAspect envFilePattern{this};
 };
 
 EnvFileSettings &settings();

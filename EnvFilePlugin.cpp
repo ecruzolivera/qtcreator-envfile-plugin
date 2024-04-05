@@ -24,60 +24,55 @@ namespace EnvFilePlugin::Internal {
 
 const QString EnvFilePluginPlugin::ENV_FILE_PATTERN = ".env";
 
-EnvFilePluginPlugin::EnvFilePluginPlugin()
-{
-    // Create your members
+EnvFilePluginPlugin::EnvFilePluginPlugin() {
+  // Create your members
 }
 
-EnvFilePluginPlugin::~EnvFilePluginPlugin()
-{
-    // Unregister objects from the plugin manager's object pool
-    // Delete members
+EnvFilePluginPlugin::~EnvFilePluginPlugin() {
+  // Unregister objects from the plugin manager's object pool
+  // Delete members
 }
 
-bool EnvFilePluginPlugin::initialize(const QStringList &arguments, QString *errorString)
-{
-    // Register objects in the plugin manager's object pool
-    // Load settings
-    // Add actions to menus
-    // Connect to other plugins' signals
-    // In the initialize function, a plugin can be sure that the plugins it
-    // depends on have initialized their members.
+bool EnvFilePluginPlugin::initialize(const QStringList &arguments, QString *errorString) {
+  // Register objects in the plugin manager's object pool
+  // Load settings
 
-    // If you need access to command line arguments or to report errors, use the
-    //    bool IPlugin::initialize(const QStringList &arguments, QString *errorString)
-    // overload.
-    auto isEnable = EnvFile::settings().enableLoadEnvFile();
-    if (isEnable) {
-      processEnvFile();
-    }
+  // Add actions to menus
+  // Connect to other plugins' signals
+  // In the initialize function, a plugin can be sure that the plugins it
+  // depends on have initialized their members.
 
+  // If you need access to command line arguments or to report errors, use the
+  //    bool IPlugin::initialize(const QStringList &arguments, QString *errorString)
+  // overload.
+  auto isEnable = EnvFile::settings().enableLoadEnvFile();
+
+  const auto envFilePattern = EnvFile::settings().envFilePattern();
+  const auto isEnabled = EnvFile::settings().enableLoadEnvFile();
+  qInfo() << "envFilePath  " << envFilePattern;
+  qInfo() << "isEnabled   " << isEnabled;
+  if (!isEnabled) {
     return true;
+  }
+  processEnvFile();
+
+  return true;
 }
 
-void EnvFilePluginPlugin::extensionsInitialized()
-{
-    // Retrieve objects from the plugin manager's object pool
-    // In the extensionsInitialized function, a plugin can be sure that all
-    // plugins that depend on it are completely initialized.
+void EnvFilePluginPlugin::extensionsInitialized() {
+  // Retrieve objects from the plugin manager's object pool
+  // In the extensionsInitialized function, a plugin can be sure that all
+  // plugins that depend on it are completely initialized.
 }
 
-ExtensionSystem::IPlugin::ShutdownFlag EnvFilePluginPlugin::aboutToShutdown()
-{
-    // Save settings
-    // Disconnect from signals that are not needed during shutdown
-    // Hide UI (if you add UI that is not in the main window directly)
-    return SynchronousShutdown;
+ExtensionSystem::IPlugin::ShutdownFlag EnvFilePluginPlugin::aboutToShutdown() {
+  // Save settings
+  // Disconnect from signals that are not needed during shutdown
+  // Hide UI (if you add UI that is not in the main window directly)
+  return SynchronousShutdown;
 }
 
 void EnvFilePluginPlugin::processEnvFile() {
-  const auto envFilePath = EnvFile::settings().envFilePath().path();
-  const auto isEnabled = EnvFile::settings().enableLoadEnvFile();
-  qInfo() << "envFilePath  " << envFilePath;
-  qInfo() << "isEnabled   " << isEnabled;
-  if (!isEnabled) {
-    return;
-  }
   connect(ProjectManager::instance(), &ProjectManager::projectAdded, this, connectProject);
 }
 

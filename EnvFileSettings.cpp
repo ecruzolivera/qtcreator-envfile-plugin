@@ -15,9 +15,8 @@ EnvFileSettings::EnvFileSettings() {
   enableLoadEnvFile.setToolTip(Tr::tr("Auto loads the .env file inthe project's root directory"));
   enableLoadEnvFile.setDefaultValue(true);
 
-  envFilePath.setSettingsKey("EnvFilePath");
-  envFilePath.setDefaultValue("");
-  envFilePath.setExpectedKind(Utils::PathChooser::File);
+  envFilePattern.setSettingsKey("EnvFilePattern");
+  envFilePattern.setDefaultValue(".env");
 
   auto layout = [this] {
     using namespace Layouting;
@@ -26,7 +25,7 @@ EnvFileSettings::EnvFileSettings() {
     return Column {
                Row {
                   enableLoadEnvFile,
-                  envFilePath,
+                  envFilePattern,
         }, st
     };
     // clang-format on
