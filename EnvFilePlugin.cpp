@@ -6,8 +6,10 @@
 #include <coreplugin/coreconstants.h>
 #include <coreplugin/icontext.h>
 #include <coreplugin/icore.h>
+#include <projectexplorer/buildconfiguration.h>
 #include <projectexplorer/project.h>
 #include <projectexplorer/projectmanager.h>
+#include <projectexplorer/runconfiguration.h>
 #include <projectexplorer/target.h>
 
 #include <QDebug>
@@ -96,19 +98,11 @@ void EnvFilePluginPlugin::processTarget(ProjectExplorer::Project *project, Proje
     qDebug() << "no target";
     return;
   }
-  qDebug() << "project " << project->displayName();
-  qDebug() << "target " << target->displayName();
 
   const auto projectDirectory = project->projectDirectory();
-
-  qDebug() << "projectDirectory  " << projectDirectory;
-
   const auto projectEnvFilePath = projectDirectory / ENV_FILE_PATTERN;
   qDebug() << "envFilePath  " << projectEnvFilePath;
   auto envFileInfo = QFileInfo{projectEnvFilePath.absoluteFilePath().toFSPathString()};
-
-  qDebug() << "envFileInfo     " << envFileInfo;
-
   qDebug() << "envFileInfo exists    " << envFileInfo.exists();
   if (!envFileInfo.exists()) {
     return;
@@ -121,11 +115,26 @@ void EnvFilePluginPlugin::processTarget(ProjectExplorer::Project *project, Proje
   }
   auto contentRaw = file.readAll();
   auto content = QString::fromUtf8(contentRaw);
+  Utils::NameValuePairs envVariables;
+
   auto lines = content.split("\n");
+
   for (const auto &line : lines) {
     if (auto maybeEnvVar = getEnvVarFromLine(line); maybeEnvVar) {
-      loadEnvVariable(target, maybeEnvVar.value());
+      envVariables.append(maybeEnvVar.value());
     }
+  }
+
+  auto env = Utils::Environment{envVariables};
+
+  auto buildConf = target->activeBuildConfiguration();
+
+  if (buildConf) {
+    qDebug() << buildConf->buildDirectory();
+    qDebug() << env.toStringList();
+    buildConf->addToEnvironment(env);
+  } else {
+    qWarning() << "no active build config";
   }
 }
 
@@ -134,8 +143,8 @@ std::optional<QPair<QString, QString>> EnvFilePluginPlugin::getEnvVarFromLine(co
   if (envPairInList.size() != 2) {
     return {};
   }
-  auto envVar = envPairInList.at(1).trimmed();
-  auto envValue = envPairInList.at(2).trimmed();
+  auto envVar = envPairInList.at(0).trimmed();
+  auto envValue = envPairInList.at(1).trimmed();
   return QPair<QString, QString>{envVar, envValue};
 }
 
